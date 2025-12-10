@@ -2,6 +2,8 @@ import os
 import csv
 from datetime import datetime
 import torch
+import pandas as pd
+import matplotlib.pyplot as plt
 
 class Logger:
     def __init__(self, save_dir):
@@ -65,3 +67,41 @@ class Logger:
             
     def get_checkpoint_path(self, name="last_model.pth"):
         return os.path.join(self.experiment_dir, name)
+
+    def plot_metrics(self):
+        """
+        Reads the log file and plots training metrics.
+        """
+        try:
+            df = pd.read_csv(self.log_file)
+            
+            graphs_dir = os.path.join(self.experiment_dir, "graphs")
+            os.makedirs(graphs_dir, exist_ok=True)
+            
+            # 1. Loss Plot
+            plt.figure(figsize=(10, 5))
+            plt.plot(df['epoch'], df['train_loss'], label='Train Loss')
+            plt.plot(df['epoch'], df['val_loss'], label='Val Loss')
+            plt.title('Training & Validation Loss')
+            plt.xlabel('Epoch')
+            plt.ylabel('Loss')
+            plt.legend()
+            plt.grid(True)
+            plt.savefig(os.path.join(graphs_dir, "loss_plot.png"))
+            plt.close()
+            
+            # 2. Dice Plot
+            plt.figure(figsize=(10, 5))
+            plt.plot(df['epoch'], df['val_dice'], label='Val Dice', color='green')
+            plt.title('Validation Dice Score')
+            plt.xlabel('Epoch')
+            plt.ylabel('Dice Score')
+            plt.legend()
+            plt.grid(True)
+            plt.savefig(os.path.join(graphs_dir, "dice_plot.png"))
+            plt.close()
+            
+            print(f"Graphs saved to: {graphs_dir}")
+            
+        except Exception as e:
+            print(f"Error plotting metrics: {e}")

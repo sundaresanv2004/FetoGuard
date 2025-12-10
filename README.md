@@ -55,10 +55,14 @@ Train the U-Net model from scratch or using pretrained weights (configured in `c
 # Default (Train 100 epochs, batch 8)
 python3 main.py --mode train
 
+# Resume Training from Checkpoint
+python3 main.py --mode train --checkpoint output/10-12-2025/12-00-00/last_model.pth
+
 # Custom Overrides
 python3 main.py --mode train --epochs 50 --batch-size 16 --lr 0.0001
 ```
-*Logs and checkpoints are saved to: `output/dd-mm-yyyy/HH-MM-SS/`*
+*   Logs and checkpoints saved to: `output/dd-mm-yyyy/HH-MM-SS/`
+*   **Graphs**: Loss and Dice plots are automatically saved to `output/.../graphs/` at the end of training.
 
 ### 2. Testing
 Evaluate a specific model checkpoint on the **Test Set**.
