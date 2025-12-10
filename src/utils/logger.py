@@ -16,7 +16,7 @@ class Logger:
         date_str = now.strftime("%d-%m-%Y")
         time_str = now.strftime("%H-%M-%S")
         
-        self.experiment_dir = os.path.join(save_dir, date_str, time_str)
+        self.experiment_dir = os.path.join(os.path.abspath(save_dir), date_str, time_str)
         os.makedirs(self.experiment_dir, exist_ok=True)
         
         print(f"Logging experiment to: {self.experiment_dir}")

@@ -1,0 +1,6 @@
+# Minimal dependencies for Google Colab
+# Colab comes with Torch, Numpy, Pandas, CV2 pre-installed.
+# We only need to install what's missing or force specific compatible versions.
+
+PyYAML
+segmentation-models-pytorch==0.3.3

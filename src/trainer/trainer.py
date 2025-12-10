@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from tqdm import tqdm
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from src.utils.logger import Logger
 from PIL import Image
 import torchvision.transforms.functional as TF
