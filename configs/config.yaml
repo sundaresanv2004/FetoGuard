@@ -1,0 +1,20 @@
+data:
+  data_dir: "data/dataset"
+  batch_size: 8
+  val_split: 0.2
+  input_size: [256, 256]
+  num_workers: 4
+
+model:
+  name: "unet_pretrained" # 'unet_custom' or 'unet_pretrained'
+  encoder: "resnet34"
+  weights: "imagenet"
+  in_channels: 3
+  classes: 1
+
+train:
+  epochs: 100
+  learning_rate: 0.001
+  device: "auto" # 'cuda', 'mps', 'cpu', or 'auto'
+  seed: 42
+  save_dir: "output"
