@@ -80,6 +80,13 @@ python3 main.py --mode predict \
 ```
 *Result saved to: `output/test/<filename>.png`*
 
+### 4. Plotting (Graph Generation)
+Generate Loss and Dice plots from an existing training log CSV.
+```bash
+python3 main.py --mode plot --csv-path output/10-12-2025/12-00-00/training_log.csv
+```
+*Graphs saved to: `output/10-12-2025/12-00-00/graphs/`*
+
 ---
 
 ## ⚙️ Configuration

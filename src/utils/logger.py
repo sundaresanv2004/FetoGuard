@@ -72,11 +72,18 @@ class Logger:
         """
         Reads the log file and plots training metrics.
         """
+        graphs_dir = os.path.join(self.experiment_dir, "graphs")
+        Logger.plot_from_csv(self.log_file, graphs_dir)
+
+    @staticmethod
+    def plot_from_csv(csv_path, output_dir):
+        """
+        Static method to plot metrics from any CSV file to an output directory.
+        """
         try:
-            df = pd.read_csv(self.log_file)
+            df = pd.read_csv(csv_path)
             
-            graphs_dir = os.path.join(self.experiment_dir, "graphs")
-            os.makedirs(graphs_dir, exist_ok=True)
+            os.makedirs(output_dir, exist_ok=True)
             
             # 1. Loss Plot
             plt.figure(figsize=(10, 5))
@@ -87,7 +94,7 @@ class Logger:
             plt.ylabel('Loss')
             plt.legend()
             plt.grid(True)
-            plt.savefig(os.path.join(graphs_dir, "loss_plot.png"))
+            plt.savefig(os.path.join(output_dir, "loss_plot.png"))
             plt.close()
             
             # 2. Dice Plot
@@ -98,10 +105,10 @@ class Logger:
             plt.ylabel('Dice Score')
             plt.legend()
             plt.grid(True)
-            plt.savefig(os.path.join(graphs_dir, "dice_plot.png"))
+            plt.savefig(os.path.join(output_dir, "dice_plot.png"))
             plt.close()
             
-            print(f"Graphs saved to: {graphs_dir}")
+            print(f"Graphs saved to: {output_dir}")
             
         except Exception as e:
             print(f"Error plotting metrics: {e}")
