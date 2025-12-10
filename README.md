@@ -1,64 +1,86 @@
 # FetoGuard
 
-## Environment Setup
+FetoGuard is a deep learning project for Fetal Head Segmentation using U-Net.
 
-This project supports two primary ways to set up your environment: using `uv` locally or using Docker. Both methods ensure you have access to the necessary CUDA libraries for GPU acceleration.
+## 📂 Project Structure
+```
+.
+├── configs/             
+│   └── config.yaml      # Configuration (Hyperparams, Paths)
+├── src/
+│   ├── data_loader/     # Custom Dataset and Transforms
+│   ├── models/          # Model Architecture (U-Net)
+│   ├── trainer/         # Training Loop & Evaluation
+│   └── utils/           # Logger & Helpers
+├── main.py              # Single Entry Point
+├── requirements.txt     # Strict Deps (Local/Docker)
+├── requirements_colab.txt # Relaxed Deps (Colab)
+└── output/              # Logs & Checkpoints
+```
 
-### Option 1: Local Development with `uv` (Recommended)
+## 🛠️ Environment Setup
 
-`uv` is an extremely fast Python package installer and resolver.
+### Option 1: Google Colab (Recommended for Quick Start)
+1.  **Clone** this repository and **Upload Data** (`dataset.zip` -> `data/dataset`).
+2.  **Install Dependencies** (uses relaxed versions to avoid conflicts):
+    ```bash
+    !pip install -r requirements_colab.txt
+    ```
 
-1.  **Install `uv`** (if not already installed):
+### Option 2: Local Development
+1.  **Install `uv`** (fast pip alternative):
     ```bash
     curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
-
-2.  **Create a virtual environment**:
-    ```bash
-    uv venv
-    ```
-
-3.  **Activate the environment**:
-    ```bash
-    source .venv/bin/activate
-    ```
-
-4.  **Install dependencies**:
+2.  **Install Dependencies** (strict versions):
     ```bash
     uv pip install -r requirements.txt
     ```
 
-5.  **Verify CUDA availability**:
-    ```bash
-    python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-    ```
+### Option 3: Docker
+```bash
+docker build -t fetoguard .
+docker run --gpus all -it fetoguard
+```
 
-### Option 2: Docker Environment
+---
 
-The Docker setup uses `uv` inside the container for fast build times and includes NVIDIA CUDA support.
+## 🚀 Usage
 
-1.  **Build the image**:
-    ```bash
-    docker build -t fetoguard .
-    ```
+All operations are handled by `main.py`.
 
-2.  **Run the container**:
-    To enable GPU access inside the container, you must use the `--gpus all` flag.
-    ```bash
-    docker run --gpus all -it fetoguard
-    ```
+### 1. Training
+Train the U-Net model from scratch or using pretrained weights (configured in `config.yaml`).
+```bash
+# Default (Train 100 epochs, batch 8)
+python3 main.py --mode train
 
-3.  **Verify Setup**:
-    Inside the container, run:
-    ```bash
-    python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-    ```
+# Custom Overrides
+python3 main.py --mode train --epochs 50 --batch-size 16 --lr 0.0001
+```
+*Logs and checkpoints are saved to: `output/dd-mm-yyyy/HH-MM-SS/`*
 
-## Requirements
+### 2. Testing
+Evaluate a specific model checkpoint on the **Test Set**.
+```bash
+python3 main.py --mode test --checkpoint output/10-12-2025/12-00-00/best_model.pth
+```
+*Output: Loss and Dice Score on the test set.*
 
-The project dependencies are listed in `requirements.txt`. Key libraries include:
-- PyTorch key
-- Torchvision
-- Torchaudio
-- Numpy, Pandas, Scikit-learn
-- Matplotlib, Tqdm, Jupyter
+### 3. Single Image Inference (Prediction)
+Generate a segmentation mask for a single image. The output will be an overlay saved to `output/test/`.
+```bash
+python3 main.py --mode predict \
+    --image-path data/dataset/test_set/005_HC.png \
+    --checkpoint output/10-12-2025/12-00-00/best_model.pth
+```
+*Result saved to: `output/test/<filename>.png`*
+
+---
+
+## ⚙️ Configuration
+You can modify default behaviors in `configs/config.yaml`:
+*   **Data Paths**: `data.data_dir`
+*   **Model**: `model.name` (`unet_pretrained` or `unet_custom`)
+*   **Training**: `train.epochs`, `train.learning_rate`
+*   **Inference**: Default `image_path`
