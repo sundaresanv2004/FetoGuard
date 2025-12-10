@@ -20,13 +20,17 @@ def parse_args():
     parser = argparse.ArgumentParser(description="FetoGuard Training/Testing Pipeline")
     
     parser.add_argument('--config', type=str, default='configs/config.yaml', help='Path to config file')
-    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test'], help='Execution mode')
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test', 'predict'], help='Execution mode')
     parser.add_argument('--checkpoint', type=str, default=None, help='Path to checkpoint to load')
     
     # Overrides
     parser.add_argument('--epochs', type=int, help='Override number of epochs')
     parser.add_argument('--batch-size', type=int, help='Override batch size')
     parser.add_argument('--lr', type=float, help='Override learning rate')
+    
+    # Inference Args
+    parser.add_argument('--image-path', type=str, help='Path to image for inference')
+    parser.add_argument('--output-path', type=str, help='Path to save prediction')
     
     return parser.parse_args()
 
@@ -81,6 +85,26 @@ def main():
     elif args.mode == 'test':
         loss, dice = trainer.evaluate('test')
         print(f"Test Results - Loss: {loss:.4f}, Dice: {dice:.4f}")
+        
+    elif args.mode == 'predict':
+        # Default logic from config
+        inference_cfg = config.get('inference', {})
+        
+        img_path = args.image_path if args.image_path else inference_cfg.get('image_path')
+        if not img_path:
+            raise ValueError("No image path provided in args or config.")
+            
+        # Determine output path
+        if args.output_path:
+            out_path = args.output_path
+        else:
+            out_dir = inference_cfg.get('output_dir', 'predictions')
+            import os
+            name = os.path.basename(img_path)
+            out_path = os.path.join(out_dir, f"pred_{name}")
+            
+        print(f"Running inference on {img_path}...")
+        trainer.predict(img_path, out_path)
 
 if __name__ == "__main__":
     main()

@@ -18,3 +18,8 @@ train:
   device: "auto" # 'cuda', 'mps', 'cpu', or 'auto'
   seed: 42
   save_dir: "output"
+
+inference:
+  checkpoint: "output/best_model.pth" # Update this to your actual model path
+  image_path: "data/dataset/test_set/000_HC.png" # Default sample
+  output_dir: "output/test"

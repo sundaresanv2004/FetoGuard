@@ -2,7 +2,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+from tqdm import tqdm
 from src.utils.logger import Logger
+from PIL import Image
+import torchvision.transforms.functional as TF
+import os
+import cv2
+import numpy as np
 
 class Trainer:
     def __init__(self, model, loaders, config, logger: Logger):
@@ -118,4 +124,63 @@ class Trainer:
             if is_best:
                 self.best_metric = val_dice
                 
+                
             self.logger.save_model(self.model, self.optimizer, epoch, val_dice, is_best)
+
+    def predict(self, image_path, output_path):
+        """
+        Runs inference on a single image.
+        """
+        self.model.eval()
+        
+        # Load and Preprocess
+        image = Image.open(image_path).convert("RGB")
+        original_size = image.size # (W, H)
+        
+        # Resize to input size
+        input_size = tuple(self.config['data']['input_size'])
+        image_tensor = TF.resize(image, input_size, interpolation=Image.BILINEAR)
+        image_tensor = TF.to_tensor(image_tensor)
+        image_tensor = TF.normalize(image_tensor, mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+        
+        # Add batch dim
+        image_tensor = image_tensor.unsqueeze(0).to(self.device)
+        
+        with torch.no_grad():
+            output = self.model(image_tensor)
+            pred = torch.sigmoid(output)
+            pred = (pred > 0.5).float()
+            
+        # Post-process
+        pred = pred.squeeze().cpu().numpy() # [H, W]
+        
+        # Resize back to original size if needed, or save as is. 
+        # Usually we want original size.
+        # But for now, let's just save the mask.
+        
+        # Convert to uint8 (0-255)
+        pred_img = (pred * 255).astype(np.uint8)
+        
+        # Resize mask back to original size
+        pred_pil = Image.fromarray(pred_img)
+        pred_pil = pred_pil.resize(original_size, resample=Image.NEAREST)
+        
+        # Create Overlay
+        # Convert PIL to Numpy for OpenCV handling or stay in PIL
+        # Let's use PIL for Alpha Blending
+        
+        # Create a red mask
+        mask_rgb = Image.new("RGB", original_size, (255, 0, 0)) # Red
+        
+        # Create alpha layer from prediction
+        mask_rgba = mask_rgb.copy()
+        mask_rgba.putalpha(pred_pil) # Use prediction as alpha channel
+        
+        # Blend
+        image_rgba = image.convert("RGBA")
+        overlay = Image.alpha_composite(image_rgba, mask_rgba)
+        
+        # Save
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        overlay.convert("RGB").save(output_path)
+        print(f"Prediction overlay saved to {output_path}")
