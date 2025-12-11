@@ -20,7 +20,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="FetoGuard Training/Testing Pipeline")
     
     parser.add_argument('--config', type=str, default='configs/config.yaml', help='Path to config file')
-    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test', 'predict'], help='Execution mode')
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test', 'predict', 'plot'], help='Execution mode')
     parser.add_argument('--checkpoint', type=str, default=None, help='Path to checkpoint to load')
     
     # Overrides
@@ -31,6 +31,7 @@ def parse_args():
     # Inference Args
     parser.add_argument('--image-path', type=str, help='Path to image for inference')
     parser.add_argument('--output-path', type=str, help='Path to save prediction')
+    parser.add_argument('--csv-path', type=str, help='Path to training log CSV for plotting')
     
     return parser.parse_args()
 
@@ -105,6 +106,18 @@ def main():
             
         print(f"Running inference on {img_path}...")
         trainer.predict(img_path, out_path)
+        
+    elif args.mode == 'plot':
+        if not args.csv_path:
+            raise ValueError("Please provide --csv-path for plot mode.")
+            
+        import os
+        # Save graphs in the same directory as the CSV, under 'graphs'
+        csv_dir = os.path.dirname(args.csv_path)
+        output_dir = os.path.join(csv_dir, "graphs")
+        
+        print(f"Generating plots from {args.csv_path}...")
+        Logger.plot_from_csv(args.csv_path, output_dir)
 
 if __name__ == "__main__":
     main()

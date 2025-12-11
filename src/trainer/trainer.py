@@ -125,6 +125,9 @@ class Trainer:
                 
                 
             self.logger.save_model(self.model, self.optimizer, epoch, val_dice, is_best)
+            
+        # End of training plotting
+        self.logger.plot_metrics()
 
     def predict(self, image_path, output_path):
         """
