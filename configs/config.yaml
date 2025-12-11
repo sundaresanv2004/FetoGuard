@@ -3,7 +3,7 @@ data:
   batch_size: 8
   val_split: 0.2
   input_size: [256, 256]
-  num_workers: 4
+  num_workers: 1
 
 model:
   name: "unet_pretrained" # 'unet_custom' or 'unet_pretrained'
@@ -13,13 +13,13 @@ model:
   classes: 1
 
 train:
-  epochs: 100
+  epochs: 300
   learning_rate: 0.001
   device: "auto" # 'cuda', 'mps', 'cpu', or 'auto'
   seed: 42
   save_dir: "output"
 
 inference:
-  checkpoint: "output/best_model.pth" # Update this to your actual model path
+  checkpoint: "output/last_model.pth" # Update this to your actual model path
   image_path: "data/dataset/test_set/000_HC.png" # Default sample
   output_dir: "output/test"

@@ -6,7 +6,7 @@ from src.utils.logger import Logger
 from PIL import Image
 import torchvision.transforms.functional as TF
 import os
-import cv2
+
 import numpy as np
 
 class Trainer:

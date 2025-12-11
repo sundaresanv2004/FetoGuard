@@ -20,3 +20,7 @@ coverage.xml
 .dockerignore
 Dockerfile
 README.md
+data/
+output/
+graphs/
+predictions/

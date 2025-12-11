@@ -1,5 +1,16 @@
 # FetoGuard
 
+## Development with Docker
+
+To run the container for development with GPU support and volume mounting (hot-reloading code changes):
+
+```bash
+docker run --gpus all -v $(pwd):/app --rm -it fetoguard:latest /bin/bash
+```
+
+This mounts your current directory to `/app` in the container, so changes to your code are immediately reflected. It also provides access to all GPUs.
+
+
 FetoGuard is a deep learning project for Fetal Head Segmentation using U-Net.
 
 ## 📂 Project Structure
